@@ -12,4 +12,7 @@
 *.out
 
 # Dependency directories (remove the comment below to include it)
-# vendor/
+vendor/
+
+**/*.emitted.swagger.json
+**/*.emitted.private.swagger.json
