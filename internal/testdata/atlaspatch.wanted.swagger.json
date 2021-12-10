@@ -1,0 +1,403 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "title": "OpenAPI V2 Atlas Patch Test",
+    "contact": {
+      "name": "John Doe",
+      "url": "https://github.com/infobloxprivate/atlas-contacts-app",
+      "email": "jdoe@infoblox.com"
+    },
+    "version": "2.0"
+  },
+  "paths": {
+    "/contact": {
+      "post": {
+        "description": "Use this method to create a contact entry in the database.",
+        "tags": [
+          "ContactService"
+        ],
+        "summary": "Create a contact.",
+        "operationId": "ContactService_Create",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/testdataContact"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/testdataCreateContactResponse"
+            }
+          }
+        }
+      }
+    },
+    "/contact/{id}": {
+      "get": {
+        "tags": [
+          "ContactService"
+        ],
+        "operationId": "ContactService_Get",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "An application specific resource identity of a resource",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/testdataGetContactResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Use this method to update a contact identified by its id.",
+        "tags": [
+          "ContactService"
+        ],
+        "summary": "Update a contact.",
+        "operationId": "ContactService_Update",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "An application specific resource identity of a resource",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/testdataContact"
+            }
+          },
+          {
+            "type": "string",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/testdataUpdateContactResponse"
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "Use this method to update a contact identified by its id.",
+        "tags": [
+          "ContactService"
+        ],
+        "summary": "Update a contact.",
+        "operationId": "ContactService_Update2",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "An application specific resource identity of a resource",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/testdataContact"
+            }
+          },
+          {
+            "type": "string",
+            "name": "fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/testdataUpdateContactResponse"
+            }
+          }
+        }
+      }
+    },
+    "/contacts": {
+      "get": {
+        "description": "Use this method to retrive list of contact objects.",
+        "tags": [
+          "ContactService"
+        ],
+        "summary": "List contacts.",
+        "operationId": "ContactService_List",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "\n\nA collection of response resources can be filtered by a logical expression string that includes JSON tag references to values in each resource, literal values, and logical operators. If a resource does not have the specified tag, its value is assumed to be null.\n\nLiteral values include numbers (integer and floating-point), and quoted (both single- or double-quoted) literal strings, and 'null'. The following operators are commonly used in filter expressions:\n\n|  Op   |  Description               | \n|  --   |  -----------               | \n|  ==   |  Equal                     | \n|  !=   |  Not Equal                 | \n|  \u003e    |  Greater Than              | \n|  \u003e=   |  Greater Than or Equal To  | \n|  \u003c    |  Less Than                 | \n|  \u003c=   |  Less Than or Equal To     | \n|  and  |  Logical AND               | \n|  ~    |  Matches Regex             | \n|  !~   |  Does Not Match Regex      | \n|  or   |  Logical OR                | \n|  not  |  Logical NOT               | \n|  ()   |  Groupping Operators       |\n\n\t\t\t\t\t\t",
+            "name": "_filter",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "\n\nA collection of response resources can be sorted by their JSON tags. For a 'flat' resource, the tag name is straightforward. If sorting is allowed on non-flat hierarchical resources, the service should implement a qualified naming scheme such as dot-qualification to reference data down the hierarchy. If a resource does not have the specified tag, its value is assumed to be null.)\n\nSpecify this parameter as a comma-separated list of JSON tag names. The sort direction can be specified by a suffix separated by whitespace before the tag name. The suffix 'asc' sorts the data in ascending order. The suffix 'desc' sorts the data in descending order. If no suffix is specified the data is sorted in ascending order.\n\n\t\t\t\t\t\t",
+            "name": "_order_by",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "\n\nA collection of response resources can be transformed by specifying a set of JSON tags to be returned. For a “flat” resource, the tag name is straightforward. If field selection is allowed on non-flat hierarchical resources, the service should implement a qualified naming scheme such as dot-qualification to reference data down the hierarchy. If a resource does not have the specified tag, the tag does not appear in the output resource.\n\nSpecify this parameter as a comma-separated list of JSON tag names.\n\n\t\t\t\t\t\t",
+            "name": "_fields",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "\n\nThe integer index (zero-origin) of the offset into a collection of resources. If omitted or null the value is assumed to be '0'.\n\n\t\t\t\t\t\t\t",
+            "name": "_offset",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "\n\nThe integer number of resources to be returned in the response. The service may impose maximum value. If omitted the service may impose a default value.\n\n\t\t\t\t\t\t\t",
+            "name": "_limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "\n\nThe service-defined string used to identify a page of resources. A null value indicates the first page.\n\n\t\t\t\t\t\t\t",
+            "name": "_page_token",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/testdataListContactResponse"
+            }
+          }
+        }
+      }
+    },
+    "/mimic": {
+      "get": {
+        "description": "For more info see https://github.com/infobloxopen/grpc-gateway/commit/b1b91ec20bc061ecbb8cafa21ea9fd96f4e06337",
+        "tags": [
+          "ContactService"
+        ],
+        "summary": "Test getting objects with mimicked primitive types.",
+        "operationId": "ContactService_GetMimic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/testdataMimicObjectResponse"
+            }
+          }
+        }
+      }
+    },
+    "/mimic/{requestValueOne}": {
+      "post": {
+        "description": "For more info see https://github.com/infobloxopen/grpc-gateway/commit/b1b91ec20bc061ecbb8cafa21ea9fd96f4e06337",
+        "tags": [
+          "ContactService"
+        ],
+        "summary": "Test posting objects with mimicked primitive types.",
+        "operationId": "ContactService_PostMimic",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "requestValueOne",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "description": "this message mimics string type, however when put in request rendered as a definition",
+              "type": "string",
+              "properties": {
+                "requestEnum": {
+                  "$ref": "#/definitions/MimicObjectRequestMimicRequestEnum"
+                },
+                "requestValueTwo": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ContactPhoneNumber": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/ContactPhoneType"
+        }
+      }
+    },
+    "ContactPhoneType": {
+      "type": "string",
+      "default": "MOBILE",
+      "enum": [
+        "MOBILE",
+        "HOME",
+        "WORK"
+      ]
+    },
+    "MimicObjectRequestMimicRequestEnum": {},
+    "MimicObjectResponseMimicResponseEnum": {
+      "type": "string",
+      "default": "VALUE_ONE",
+      "enum": [
+        "VALUE_ONE",
+        "VALUE_TWO"
+      ]
+    },
+    "apiPageInfo": {
+      "description": "PageInfo represents both server-driven and client-driven pagination response.\nServer-driven pagination is a model in which the server returns some\namount of data along with an token indicating there is more data\nand where subsequent queries can get the next page of data.\nClient-driven pagination is a model in which rows are addressable by\noffset and page size (limit).",
+      "type": "object",
+      "properties": {
+        "offset": {
+          "description": "The service may optionally include the offset of the next page of resources.\nA null value indicates no more pages.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageToken": {
+          "description": "The service response should contain a string to indicate\nthe next page of resources.\nA null value indicates no more pages.",
+          "type": "string"
+        },
+        "size": {
+          "description": "The service may optionally include the total number of resources being paged.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "testdataContact": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "id": {
+          "description": "The resource identifier.",
+          "type": "string",
+          "readOnly": true
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "name": {
+          "type": "string"
+        },
+        "phones": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ContactPhoneNumber"
+          }
+        }
+      }
+    },
+    "testdataCreateContactResponse": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/testdataContact"
+        }
+      }
+    },
+    "testdataGetContactResponse": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/testdataContact"
+        }
+      }
+    },
+    "testdataListContactResponse": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "$ref": "#/definitions/apiPageInfo"
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/testdataContact"
+          }
+        }
+      }
+    },
+    "testdataMimicObjectResponse": {
+      "description": "this message mimics string type, however when put in response rendered as a definition",
+      "type": "string",
+      "properties": {
+        "responseEnum": {
+          "$ref": "#/definitions/MimicObjectResponseMimicResponseEnum"
+        },
+        "responseValueOne": {
+          "type": "string"
+        },
+        "responseValueTwo": {
+          "type": "string"
+        }
+      }
+    },
+    "testdataUpdateContactResponse": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/testdataContact"
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "ContactService"
+    }
+  ]
+}
