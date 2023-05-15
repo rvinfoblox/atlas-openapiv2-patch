@@ -28,6 +28,14 @@ const (
 	exampleAnnotation = "@example"
 )
 
+const (
+	DefaultGetResponse    = 200
+	DefaultPostResponse   = 201
+	DefaultPutResponse    = 201
+	DefaultPatchResponse  = 201
+	DefaultDeleteResponse = 204
+)
+
 var (
 	sw       spec.Swagger
 	seenRefs = map[string]bool{}
@@ -46,7 +54,9 @@ func filterPathVars(path string, params []spec.Parameter) []spec.Parameter {
 	return newParams
 }
 
-func AtlasSwagger(b []byte, withPrivateMethods, withCustomAnnotations bool) string {
+func AtlasSwagger(b []byte, withPrivateMethods, withCustomAnnotations bool,
+	responseCodesMap map[string]int) string {
+
 	if err := json.Unmarshal(b, &sw); err != nil {
 		glog.V(1).Infof("error parsing JSON: %v\n", err)
 		os.Exit(1)
@@ -242,7 +252,7 @@ The service-defined string used to identify a page of resources. A null value in
 							if len(def.Properties) == 0 {
 								rsp.Description = "No Content"
 								rsp.Schema = nil
-								op.Responses.StatusCodeResponses[opToStatusCode(on)] = rsp
+								op.Responses.StatusCodeResponses[responseCodesMap[on]] = rsp
 								delete(sw.Definitions, trim(rsp.Ref))
 								delete(op.Responses.StatusCodeResponses, 200)
 								break
@@ -254,7 +264,7 @@ The service-defined string used to identify a page of resources. A null value in
 							sw.Definitions[trim(rsp.Schema.Ref)] = schema
 							refs = append(refs, rsp.Schema.Ref)
 							delete(op.Responses.StatusCodeResponses, 200)
-							op.Responses.StatusCodeResponses[opToStatusCode(on)] = rsp
+							op.Responses.StatusCodeResponses[responseCodesMap[on]] = rsp
 						}
 					}
 				}
@@ -484,26 +494,6 @@ func pathItemAsMap(pi spec.PathItem) map[string]*spec.Operation {
 		"DELETE": pi.Delete,
 		"PATCH":  pi.Patch,
 	}
-}
-
-func opToStatusCode(on string) int {
-	return map[string]int{
-		"GET":    200,
-		"POST":   201,
-		"PUT":    201,
-		"PATCH":  201,
-		"DELETE": 204,
-	}[on]
-}
-
-func opToTextCode(on string) string {
-	return map[string]string{
-		"GET":    "OK",
-		"POST":   "CREATED",
-		"PUT":    "UPDATED",
-		"PATCH":  "UPDATED",
-		"DELETE": "DELETED",
-	}[on]
 }
 
 func IsStringInSlice(slice []string, str string) bool {
