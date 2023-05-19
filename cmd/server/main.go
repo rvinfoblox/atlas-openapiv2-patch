@@ -21,7 +21,17 @@ func run(reg *descriptor.Registry, swaggerFiles []string) error {
 		if err != nil {
 			return err
 		}
-		resp := genopenapi.AtlasSwagger(f, reg.IsWithPrivateOperations(), reg.IsWithCustomAnnotations())
+
+		responseCodesMap := map[string]int{
+			"GET":    reg.GetResponse(),
+			"POST":   reg.PostResponse(),
+			"PUT":    reg.PutResponse(),
+			"PATCH":  reg.PatchResponse(),
+			"DELETE": reg.DeleteResponse(),
+		}
+
+		resp := genopenapi.AtlasSwagger(f, reg.IsWithPrivateOperations(), reg.IsWithCustomAnnotations(),
+			responseCodesMap)
 
 		if reg.IsWithPrivateOperations() {
 			err = os.Remove(file)
@@ -45,6 +55,11 @@ func main() {
 
 	reg.SetPrivateOperations(*withPrivate)
 	reg.SetCustomAnnotations(*withCustomAnnotations)
+	reg.SetPostResponse(*withPostResponse)
+	reg.SetPutResponse(*withPutResponse)
+	reg.SetPatchResponse(*withPatchResponse)
+	reg.SetDeleteResponse(*withDeleteResponse)
+	fmt.Printf("input args: %+v\n", reg)
 	glog.V(1).Info("Processing code generator request")
 
 	if len(*swaggerFiles) == 0 {

@@ -87,6 +87,10 @@ func Test_run(t *testing.T) {
 	type args struct {
 		withPrivate           bool
 		withCustomAnnotations bool
+		withPostResponse      int
+		withPutResponse       int
+		withPatchResponse     int
+		withDeleteResponse    int
 		files                 []string
 	}
 	tests := []struct {
@@ -119,15 +123,17 @@ func Test_run(t *testing.T) {
 			generatedFiles: []string{"../../internal/testdata/atlaspatch.emitted.swagger.json"},
 		},
 		{
-			name:    "with private flags",
+			name:    "with custom HTTP response codes - use non-default response codes here for testing",
 			wantErr: false,
 			args: args{
-				withPrivate:           true,
-				withCustomAnnotations: false,
-				files:                 []string{"../../internal/testdata/atlaspatch.emitted.swagger.json"},
+				withPostResponse:   302,
+				withPutResponse:    303,
+				withPatchResponse:  304,
+				withDeleteResponse: 305,
+				files:              []string{"../../internal/testdata/atlaspatch.emitted.customresponses.swagger.json"},
 			},
-			wantFile:       "../../internal/testdata/atlaspatch.wanted.private.swagger.json",
-			generatedFiles: []string{"../../internal/testdata/atlaspatch.emitted.private.swagger.json"},
+			wantFile:       "../../internal/testdata/atlaspatch.wanted.customresponses.swagger.json",
+			generatedFiles: []string{"../../internal/testdata/atlaspatch.emitted.customresponses.swagger.json"},
 		},
 	}
 	reg := descriptor.NewRegistry()
@@ -135,6 +141,19 @@ func Test_run(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			reg.SetPrivateOperations(tt.args.withPrivate)
 			reg.SetCustomAnnotations(tt.args.withCustomAnnotations)
+
+			if tt.args.withPostResponse > 0 {
+				reg.SetPostResponse(tt.args.withPostResponse)
+			}
+			if tt.args.withPutResponse > 0 {
+				reg.SetPutResponse(tt.args.withPutResponse)
+			}
+			if tt.args.withPatchResponse > 0 {
+				reg.SetPatchResponse(tt.args.withPatchResponse)
+			}
+			if tt.args.withDeleteResponse > 0 {
+				reg.SetDeleteResponse(tt.args.withDeleteResponse)
+			}
 			err := createFiles(tt.args.files)
 			defer deleteFiles(tt.generatedFiles)
 			defer deleteFiles(tt.args.files)
