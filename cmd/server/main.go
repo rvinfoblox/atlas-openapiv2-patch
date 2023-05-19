@@ -59,6 +59,7 @@ func main() {
 	reg.SetPutResponse(*withPutResponse)
 	reg.SetPatchResponse(*withPatchResponse)
 	reg.SetDeleteResponse(*withDeleteResponse)
+	fmt.Printf("input args: %+v\n", reg)
 	glog.V(1).Info("Processing code generator request")
 
 	if len(*swaggerFiles) == 0 {
