@@ -264,7 +264,7 @@ The service-defined string used to identify a page of resources. A null value in
 							sw.Definitions[trim(rsp.Schema.Ref)] = schema
 							refs = append(refs, rsp.Schema.Ref)
 							op.Responses.StatusCodeResponses[responseCodesMap[on]] = rsp
-							delete(op.Responses.StatusCodeResponses, 200)
+							// delete(op.Responses.StatusCodeResponses, 200)
 						}
 					}
 				}
