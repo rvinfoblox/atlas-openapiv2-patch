@@ -105,6 +105,9 @@ func (r *Registry) String() string {
 
 		privateOperations          ` + fmt.Sprintf("%t", r.privateOperations) + `
 		customAnnotations          ` + fmt.Sprintf("%t", r.customAnnotations) + `
-
+		postResponse               ` + fmt.Sprintf("%t", r.postResponse) + `
+		putResponse                ` + fmt.Sprintf("%t", r.putResponse) + `
+		patchResponse              ` + fmt.Sprintf("%t", r.patchResponse) + `
+		deleteResponse             ` + fmt.Sprintf("%t", r.deleteResponse) + `
 `
 }
