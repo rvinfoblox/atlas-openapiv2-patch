@@ -252,9 +252,10 @@ The service-defined string used to identify a page of resources. A null value in
 							if len(def.Properties) == 0 {
 								rsp.Description = "No Content"
 								rsp.Schema = nil
-								op.Responses.StatusCodeResponses[responseCodesMap[on]] = rsp
+								respCode := responseCodesMap[on]
+								op.Responses.StatusCodeResponses[respCode] = rsp
 								delete(sw.Definitions, trim(rsp.Ref))
-								delete(op.Responses.StatusCodeResponses, 200)
+								delete(op.Responses.StatusCodeResponses, respCode)
 								break
 							}
 							sw.Definitions[trim(rsp.Schema.Ref)] = schema
@@ -263,9 +264,9 @@ The service-defined string used to identify a page of resources. A null value in
 						default:
 							sw.Definitions[trim(rsp.Schema.Ref)] = schema
 							refs = append(refs, rsp.Schema.Ref)
-							delete(op.Responses.StatusCodeResponses, 200)
-							op.Responses.StatusCodeResponses[200] = rsp
-							op.Responses.StatusCodeResponses[responseCodesMap[on]] = rsp
+							respCode := responseCodesMap[on]
+							delete(op.Responses.StatusCodeResponses, respCode)
+							op.Responses.StatusCodeResponses[respCode] = rsp
 						}
 					}
 				}
