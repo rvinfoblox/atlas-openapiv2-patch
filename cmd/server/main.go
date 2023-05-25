@@ -30,7 +30,7 @@ func run(reg *descriptor.Registry, swaggerFiles []string) error {
 			"DELETE": reg.DeleteResponse(),
 		}
 
-		fmt.Printf("responseCodesMap = %+v\n", responseCodesMap)
+		fmt.Printf("file = %s, responseCodesMap = %+v\n", fileName, responseCodesMap)
 		resp := genopenapi.AtlasSwagger(f, reg.IsWithPrivateOperations(), reg.IsWithCustomAnnotations(),
 			responseCodesMap)
 
