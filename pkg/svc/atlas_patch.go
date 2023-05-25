@@ -39,6 +39,14 @@ const (
 var (
 	sw       spec.Swagger
 	seenRefs = map[string]bool{}
+
+	defaultResponseCodesMap = map[string]int{
+		"GET":    DefaultGetResponse,
+		"POST":   DefaultPostResponse,
+		"PUT":    DefaultPutResponse,
+		"PATCH":  DefaultPatchResponse,
+		"DELETE": DefaultDeleteResponse,
+	}
 )
 
 // filterPathVars returns new params list with: required "true" and path "in" variables only if they present
@@ -219,55 +227,60 @@ The service-defined string used to identify a page of resources. A null value in
 
 			// Wrap responses
 			if op.Responses.StatusCodeResponses != nil {
-				// check if StatusCodeResponses has 201 >= x < 300 then delete 200 and don't go to isNilRef check
-				exists := false
-				for code := range op.Responses.StatusCodeResponses {
-					if code >= 201 && code < 300 {
-						exists = true
+				// Check if we need to override the default behavior by checking args
+				respCode := responseCodesMap[on]
+				if respCode == defaultResponseCodesMap[on] {
+					// args not overridden - perform response code override
+
+					// check if StatusCodeResponses has 201 >= x < 300 then delete 200 and don't go to isNilRef check
+					exists := false
+					for code := range op.Responses.StatusCodeResponses {
+						if code >= 201 && code < 300 {
+							exists = true
+						}
+						break
 					}
-					break
-				}
-				if exists {
-					delete(op.Responses.StatusCodeResponses, 200)
-				} else {
-					rsp := op.Responses.StatusCodeResponses[200]
-					if !isNilRef(rsp.Schema.Ref) {
-						s, _, err := rsp.Schema.Ref.GetPointer().Get(sw)
-						if err != nil {
-							panic(err)
-						}
-
-						schema := s.(spec.Schema)
-						if schema.Properties == nil {
-							schema.Properties = map[string]spec.Schema{}
-						}
-
-						def := sw.Definitions[trim(rsp.Schema.Ref)]
-						if rsp.Description == "" {
-							rsp.Description = on + " operation response"
-						}
-
-						switch on {
-						case "DELETE":
-							if len(def.Properties) == 0 {
-								rsp.Description = "No Content"
-								rsp.Schema = nil
-								respCode := responseCodesMap[on]
-								op.Responses.StatusCodeResponses[respCode] = rsp
-								delete(sw.Definitions, trim(rsp.Ref))
-								delete(op.Responses.StatusCodeResponses, respCode)
-								break
+					if exists {
+						delete(op.Responses.StatusCodeResponses, 200)
+					} else {
+						rsp := op.Responses.StatusCodeResponses[200]
+						if !isNilRef(rsp.Schema.Ref) {
+							s, _, err := rsp.Schema.Ref.GetPointer().Get(sw)
+							if err != nil {
+								panic(err)
 							}
-							sw.Definitions[trim(rsp.Schema.Ref)] = schema
-							refs = append(refs, rsp.Schema.Ref)
-							op.Responses.StatusCodeResponses[200] = rsp
-						default:
-							sw.Definitions[trim(rsp.Schema.Ref)] = schema
-							refs = append(refs, rsp.Schema.Ref)
-							respCode := responseCodesMap[on]
-							delete(op.Responses.StatusCodeResponses, 201)
-							fmt.Printf("non-delete case")
-							op.Responses.StatusCodeResponses[respCode] = rsp
+
+							schema := s.(spec.Schema)
+							if schema.Properties == nil {
+								schema.Properties = map[string]spec.Schema{}
+							}
+
+							def := sw.Definitions[trim(rsp.Schema.Ref)]
+							if rsp.Description == "" {
+								rsp.Description = on + " operation response"
+							}
+
+							switch on {
+							case "DELETE":
+								if len(def.Properties) == 0 {
+									rsp.Description = "No Content"
+									rsp.Schema = nil
+									respCode := responseCodesMap[on]
+									op.Responses.StatusCodeResponses[respCode] = rsp
+									delete(sw.Definitions, trim(rsp.Ref))
+									delete(op.Responses.StatusCodeResponses, respCode)
+									break
+								}
+								sw.Definitions[trim(rsp.Schema.Ref)] = schema
+								refs = append(refs, rsp.Schema.Ref)
+								op.Responses.StatusCodeResponses[200] = rsp
+							default:
+								sw.Definitions[trim(rsp.Schema.Ref)] = schema
+								refs = append(refs, rsp.Schema.Ref)
+								respCode := responseCodesMap[on]
+								delete(op.Responses.StatusCodeResponses, 201)
+								op.Responses.StatusCodeResponses[respCode] = rsp
+							}
 						}
 					}
 				}
