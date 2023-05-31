@@ -55,6 +55,9 @@ func deepCompare(file1, file2 string) (bool, error) {
 		}
 
 		if !bytes.Equal(b1, b2) {
+			fmt.Printf("File1 %s:\n%s\n-------------\n\nFile2 %s:\n%s\n",
+				file1, string(b1),
+				file2, string(b2))
 			return false, nil
 		}
 	}
@@ -134,6 +137,19 @@ func Test_run(t *testing.T) {
 			},
 			wantFile:       "../../internal/testdata/atlaspatch.wanted.customresponses.swagger.json",
 			generatedFiles: []string{"../../internal/testdata/atlaspatch.emitted.customresponses.swagger.json"},
+		},
+		{
+			name:    "with custom HTTP response codes - use 200 response codes for all APIs for testing",
+			wantErr: false,
+			args: args{
+				withPostResponse:   200,
+				withPutResponse:    200,
+				withPatchResponse:  200,
+				withDeleteResponse: 200,
+				files:              []string{"../../internal/testdata/atlaspatch.emitted.customresponses2.swagger.json"},
+			},
+			wantFile:       "../../internal/testdata/atlaspatch.wanted.customresponses2.swagger.json",
+			generatedFiles: []string{"../../internal/testdata/atlaspatch.emitted.customresponses2.swagger.json"},
 		},
 	}
 	reg := descriptor.NewRegistry()
