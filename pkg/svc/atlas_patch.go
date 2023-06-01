@@ -299,7 +299,8 @@ The service-defined string used to identify a page of resources. A null value in
 								}
 								sw.Definitions[trim(rsp.Schema.Ref)] = schema
 								refs = append(refs, rsp.Schema.Ref)
-								op.Responses.StatusCodeResponses[index] = rsp
+								delete(op.Responses.StatusCodeResponses, index)
+								op.Responses.StatusCodeResponses[responseCodesMap[on]] = rsp
 							default:
 								sw.Definitions[trim(rsp.Schema.Ref)] = schema
 								refs = append(refs, rsp.Schema.Ref)
