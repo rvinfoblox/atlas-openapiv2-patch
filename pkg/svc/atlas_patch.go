@@ -264,7 +264,10 @@ The service-defined string used to identify a page of resources. A null value in
 				} else {
 					rsp := op.Responses.StatusCodeResponses[index]
 
-					if rsp.Schema != nil {
+					if rsp.Schema == nil {
+						delete(op.Responses.StatusCodeResponses, index)
+						op.Responses.StatusCodeResponses[responseCodesMap[on]] = rsp
+					} else {
 						if verbose {
 							fmt.Println("isNilRef(rsp.Schema.Ref)", isNilRef(rsp.Schema.Ref))
 						}
