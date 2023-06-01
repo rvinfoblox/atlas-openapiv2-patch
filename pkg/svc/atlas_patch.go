@@ -251,46 +251,48 @@ The service-defined string used to identify a page of resources. A null value in
 				} else {
 					rsp := op.Responses.StatusCodeResponses[200]
 
-					if verbose {
-						fmt.Println("isNilRef(rsp.Schema.Ref", isNilRef(rsp.Schema.Ref))
-					}
-					if !isNilRef(rsp.Schema.Ref) {
-						s, _, err := rsp.Schema.Ref.GetPointer().Get(sw)
-						if err != nil {
-							panic(err)
-						}
-
-						schema := s.(spec.Schema)
-						if schema.Properties == nil {
-							schema.Properties = map[string]spec.Schema{}
-						}
-
-						def := sw.Definitions[trim(rsp.Schema.Ref)]
-						if rsp.Description == "" {
-							rsp.Description = on + " operation response"
-						}
-
+					if rsp.Schema != nil {
 						if verbose {
-							fmt.Println("responseCodesMap[on]", responseCodesMap[on])
+							fmt.Println("isNilRef(rsp.Schema.Ref)", isNilRef(rsp.Schema.Ref))
 						}
-						switch on {
-						case "DELETE":
-							if len(def.Properties) == 0 {
-								rsp.Description = "No Content"
-								rsp.Schema = nil
+						if !isNilRef(rsp.Schema.Ref) {
+							s, _, err := rsp.Schema.Ref.GetPointer().Get(sw)
+							if err != nil {
+								panic(err)
+							}
+
+							schema := s.(spec.Schema)
+							if schema.Properties == nil {
+								schema.Properties = map[string]spec.Schema{}
+							}
+
+							def := sw.Definitions[trim(rsp.Schema.Ref)]
+							if rsp.Description == "" {
+								rsp.Description = on + " operation response"
+							}
+
+							if verbose {
+								fmt.Println("responseCodesMap[on]", responseCodesMap[on])
+							}
+							switch on {
+							case "DELETE":
+								if len(def.Properties) == 0 {
+									rsp.Description = "No Content"
+									rsp.Schema = nil
+									delete(op.Responses.StatusCodeResponses, 200)
+									op.Responses.StatusCodeResponses[responseCodesMap[on]] = rsp
+									delete(sw.Definitions, trim(rsp.Ref))
+									break
+								}
+								sw.Definitions[trim(rsp.Schema.Ref)] = schema
+								refs = append(refs, rsp.Schema.Ref)
+								op.Responses.StatusCodeResponses[200] = rsp
+							default:
+								sw.Definitions[trim(rsp.Schema.Ref)] = schema
+								refs = append(refs, rsp.Schema.Ref)
 								delete(op.Responses.StatusCodeResponses, 200)
 								op.Responses.StatusCodeResponses[responseCodesMap[on]] = rsp
-								delete(sw.Definitions, trim(rsp.Ref))
-								break
 							}
-							sw.Definitions[trim(rsp.Schema.Ref)] = schema
-							refs = append(refs, rsp.Schema.Ref)
-							op.Responses.StatusCodeResponses[200] = rsp
-						default:
-							sw.Definitions[trim(rsp.Schema.Ref)] = schema
-							refs = append(refs, rsp.Schema.Ref)
-							delete(op.Responses.StatusCodeResponses, 200)
-							op.Responses.StatusCodeResponses[responseCodesMap[on]] = rsp
 						}
 					}
 				}
