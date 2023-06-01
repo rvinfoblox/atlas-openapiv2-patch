@@ -111,7 +111,17 @@ func AtlasSwagger(b []byte, withPrivateMethods, withCustomAnnotations bool,
 			}
 		}
 		pn := strings.Join(pnElements, "/")
+
+		verbose := strings.Contains(pn, "option_group") ||
+			strings.Contains(pn, "contact")
+
+		if verbose {
+			fmt.Println("~~~~~~~~~~~~~~~~~~~~~\npath", pn, "\n~~~~~~~~~~~~~")
+		}
 		for on, op := range pathItemAsMap(pi) {
+			if verbose {
+				fmt.Println("on, op", on, op != nil)
+			}
 			if op == nil {
 				continue
 			}
@@ -217,6 +227,9 @@ The service-defined string used to identify a page of resources. A null value in
 			}
 			op.Parameters = fixedParams
 
+			if verbose {
+				fmt.Println("op.Responses.StatusCodeResponses != nil", op.Responses.StatusCodeResponses != nil)
+			}
 			// Wrap responses
 			if op.Responses.StatusCodeResponses != nil {
 				// check if StatusCodeResponses has 201 >= x < 300 then delete 200 and don't go to isNilRef check
@@ -228,9 +241,16 @@ The service-defined string used to identify a page of resources. A null value in
 					break
 				}
 				if exists {
+					if verbose {
+						fmt.Println("201-300 exists - if true, 200 will be deleted: ", exists)
+					}
 					delete(op.Responses.StatusCodeResponses, 200)
 				} else {
 					rsp := op.Responses.StatusCodeResponses[200]
+
+					if verbose {
+						fmt.Println("isNilRef(rsp.Schema.Ref", isNilRef(rsp.Schema.Ref))
+					}
 					if !isNilRef(rsp.Schema.Ref) {
 						s, _, err := rsp.Schema.Ref.GetPointer().Get(sw)
 						if err != nil {
@@ -247,14 +267,17 @@ The service-defined string used to identify a page of resources. A null value in
 							rsp.Description = on + " operation response"
 						}
 
+						if verbose {
+							fmt.Println("responseCodesMap[on]", responseCodesMap[on])
+						}
 						switch on {
 						case "DELETE":
 							if len(def.Properties) == 0 {
 								rsp.Description = "No Content"
 								rsp.Schema = nil
+								delete(op.Responses.StatusCodeResponses, 200)
 								op.Responses.StatusCodeResponses[responseCodesMap[on]] = rsp
 								delete(sw.Definitions, trim(rsp.Ref))
-								delete(op.Responses.StatusCodeResponses, 200)
 								break
 							}
 							sw.Definitions[trim(rsp.Schema.Ref)] = schema
