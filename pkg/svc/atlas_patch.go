@@ -39,6 +39,14 @@ const (
 var (
 	sw       spec.Swagger
 	seenRefs = map[string]bool{}
+
+	defaultResponseCodesMap = map[string]int{
+		"GET":    200,
+		"POST":   201,
+		"PUT":    201,
+		"PATCH":  201,
+		"DELETE": 204,
+	}
 )
 
 // filterPathVars returns new params list with: required "true" and path "in" variables only if they present
@@ -113,7 +121,8 @@ func AtlasSwagger(b []byte, withPrivateMethods, withCustomAnnotations bool,
 		pn := strings.Join(pnElements, "/")
 
 		verbose := strings.Contains(pn, "option_group") ||
-			strings.Contains(pn, "contact")
+			strings.Contains(pn, "contact") ||
+			strings.Contains(pn, "testdata")
 
 		if verbose {
 			fmt.Println("~~~~~~~~~~~~~~~~~~~~~\npath", pn, "\n~~~~~~~~~~~~~")
@@ -243,13 +252,17 @@ The service-defined string used to identify a page of resources. A null value in
 					}
 				}
 
+				index := 200
+				if responseCodesMap[on] == 200 {
+					index = defaultResponseCodesMap[on]
+				}
 				if exists {
 					if verbose {
 						fmt.Println("201-300 exists - if true, 200 will be deleted: ", exists)
 					}
-					delete(op.Responses.StatusCodeResponses, 200)
+					delete(op.Responses.StatusCodeResponses, index)
 				} else {
-					rsp := op.Responses.StatusCodeResponses[200]
+					rsp := op.Responses.StatusCodeResponses[index]
 
 					if rsp.Schema != nil {
 						if verbose {
@@ -279,18 +292,18 @@ The service-defined string used to identify a page of resources. A null value in
 								if len(def.Properties) == 0 {
 									rsp.Description = "No Content"
 									rsp.Schema = nil
-									delete(op.Responses.StatusCodeResponses, 200)
+									delete(op.Responses.StatusCodeResponses, index)
 									op.Responses.StatusCodeResponses[responseCodesMap[on]] = rsp
 									delete(sw.Definitions, trim(rsp.Ref))
 									break
 								}
 								sw.Definitions[trim(rsp.Schema.Ref)] = schema
 								refs = append(refs, rsp.Schema.Ref)
-								op.Responses.StatusCodeResponses[200] = rsp
+								op.Responses.StatusCodeResponses[index] = rsp
 							default:
 								sw.Definitions[trim(rsp.Schema.Ref)] = schema
 								refs = append(refs, rsp.Schema.Ref)
-								delete(op.Responses.StatusCodeResponses, 200)
+								delete(op.Responses.StatusCodeResponses, index)
 								op.Responses.StatusCodeResponses[responseCodesMap[on]] = rsp
 							}
 						}
