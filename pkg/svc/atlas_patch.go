@@ -41,11 +41,11 @@ var (
 	seenRefs = map[string]bool{}
 
 	defaultResponseCodesMap = map[string]int{
-		"GET":    200,
-		"POST":   201,
-		"PUT":    201,
-		"PATCH":  201,
-		"DELETE": 204,
+		"GET":    DefaultGetResponse,
+		"POST":   DefaultPostResponse,
+		"PUT":    DefaultPutResponse,
+		"PATCH":  DefaultPatchResponse,
+		"DELETE": DefaultDeleteResponse,
 	}
 )
 
@@ -243,7 +243,7 @@ The service-defined string used to identify a page of resources. A null value in
 			if op.Responses.StatusCodeResponses != nil {
 				// check if StatusCodeResponses has 201 >= x < 300 then delete 200 and don't go to isNilRef check
 				exists := false
-				if responseCodesMap[on] != 200 {
+				if responseCodesMap[on] != defaultResponseCodesMap[on] {
 					for code := range op.Responses.StatusCodeResponses {
 						if code >= 201 && code < 300 {
 							exists = true
@@ -252,8 +252,8 @@ The service-defined string used to identify a page of resources. A null value in
 					}
 				}
 
-				index := 200
-				if responseCodesMap[on] == 200 {
+				index := defaultResponseCodesMap[on]
+				if responseCodesMap[on] != defaultResponseCodesMap[on] {
 					index = defaultResponseCodesMap[on]
 				}
 				if exists {
