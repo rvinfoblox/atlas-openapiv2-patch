@@ -16,6 +16,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 
@@ -293,7 +294,7 @@ The service-defined string used to identify a page of resources. A null value in
 							switch on {
 							case "DELETE":
 								if len(def.Properties) == 0 {
-									rsp.Description = "No Content"
+									rsp.Description = http.StatusText(responseCodesMap[on])
 									rsp.Schema = nil
 									delete(op.Responses.StatusCodeResponses, index)
 									op.Responses.StatusCodeResponses[responseCodesMap[on]] = rsp
