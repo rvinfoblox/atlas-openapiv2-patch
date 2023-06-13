@@ -290,7 +290,7 @@ The service-defined string used to identify a page of resources. A null value in
 
 							if verbose {
 								fmt.Println("responseCodesMap[on]", responseCodesMap[on])
-								fmt.Println("http.StatusText(responseCodesMap[on])", http.StatusText((responseCodesMap[on]))
+								fmt.Println("http.StatusText(responseCodesMap[on])", http.StatusText((responseCodesMap[on])))
 								fmt.Println("len(def.Properties)", len(def.Properties))
 							}
 							switch on {
