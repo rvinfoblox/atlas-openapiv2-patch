@@ -240,11 +240,13 @@ The service-defined string used to identify a page of resources. A null value in
 			if verbose {
 				fmt.Println("op.Responses.StatusCodeResponses != nil", op.Responses.StatusCodeResponses != nil)
 			}
+
+			responseCode := responseCodesMap[on]
 			// Wrap responses
 			if op.Responses.StatusCodeResponses != nil {
 				// check if StatusCodeResponses has 201 >= x < 300 then delete 200 and don't go to isNilRef check
 				exists := false
-				if responseCodesMap[on] != 200 {
+				if responseCode != 200 {
 					for code := range op.Responses.StatusCodeResponses {
 						if code >= 201 && code < 300 {
 							exists = true
@@ -254,7 +256,7 @@ The service-defined string used to identify a page of resources. A null value in
 				}
 
 				index := 200
-				if responseCodesMap[on] == 200 {
+				if responseCode == 200 {
 					index = defaultResponseCodesMap[on]
 				}
 				if exists {
@@ -267,7 +269,7 @@ The service-defined string used to identify a page of resources. A null value in
 
 					if rsp.Schema == nil {
 						delete(op.Responses.StatusCodeResponses, index)
-						op.Responses.StatusCodeResponses[responseCodesMap[on]] = rsp
+						op.Responses.StatusCodeResponses[responseCode] = rsp
 					} else {
 						if verbose {
 							fmt.Println("isNilRef(rsp.Schema.Ref)", isNilRef(rsp.Schema.Ref))
@@ -289,29 +291,30 @@ The service-defined string used to identify a page of resources. A null value in
 							}
 
 							if verbose {
-								fmt.Println("responseCodesMap[on]", responseCodesMap[on])
-								fmt.Println("http.StatusText(responseCodesMap[on])", http.StatusText((responseCodesMap[on])))
+								fmt.Println("responseCodes", responseCode)
+								fmt.Println("http.StatusText(responseCode)", http.StatusText(responseCode))
 								fmt.Println("len(def.Properties)", len(def.Properties))
 							}
 							switch on {
 							case "DELETE":
 								if len(def.Properties) == 0 {
-									rsp.Description = http.StatusText(responseCodesMap[on])
+									rsp.Description = http.StatusText(responseCode)
 									rsp.Schema = nil
 									delete(op.Responses.StatusCodeResponses, index)
-									op.Responses.StatusCodeResponses[responseCodesMap[on]] = rsp
+									op.Responses.StatusCodeResponses[responseCode] = rsp
 									delete(sw.Definitions, trim(rsp.Ref))
 									break
 								}
+								rsp.Description = http.StatusText(responseCode)
 								sw.Definitions[trim(rsp.Schema.Ref)] = schema
 								refs = append(refs, rsp.Schema.Ref)
 								delete(op.Responses.StatusCodeResponses, index)
-								op.Responses.StatusCodeResponses[responseCodesMap[on]] = rsp
+								op.Responses.StatusCodeResponses[responseCode] = rsp
 							default:
 								sw.Definitions[trim(rsp.Schema.Ref)] = schema
 								refs = append(refs, rsp.Schema.Ref)
 								delete(op.Responses.StatusCodeResponses, index)
-								op.Responses.StatusCodeResponses[responseCodesMap[on]] = rsp
+								op.Responses.StatusCodeResponses[responseCode] = rsp
 							}
 						}
 					}
