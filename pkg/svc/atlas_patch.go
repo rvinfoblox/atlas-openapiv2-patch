@@ -268,6 +268,9 @@ The service-defined string used to identify a page of resources. A null value in
 					rsp := op.Responses.StatusCodeResponses[index]
 
 					if rsp.Schema == nil {
+						if on == "DELETE" {
+							rsp.Description = http.StatusText(responseCode)
+						}
 						delete(op.Responses.StatusCodeResponses, index)
 						op.Responses.StatusCodeResponses[responseCode] = rsp
 					} else {
@@ -297,15 +300,14 @@ The service-defined string used to identify a page of resources. A null value in
 							}
 							switch on {
 							case "DELETE":
+								rsp.Description = http.StatusText(responseCode)
 								if len(def.Properties) == 0 {
-									rsp.Description = http.StatusText(responseCode)
 									rsp.Schema = nil
 									delete(op.Responses.StatusCodeResponses, index)
 									op.Responses.StatusCodeResponses[responseCode] = rsp
 									delete(sw.Definitions, trim(rsp.Ref))
 									break
 								}
-								rsp.Description = http.StatusText(responseCode)
 								sw.Definitions[trim(rsp.Schema.Ref)] = schema
 								refs = append(refs, rsp.Schema.Ref)
 								delete(op.Responses.StatusCodeResponses, index)
@@ -315,10 +317,6 @@ The service-defined string used to identify a page of resources. A null value in
 								refs = append(refs, rsp.Schema.Ref)
 								delete(op.Responses.StatusCodeResponses, index)
 								op.Responses.StatusCodeResponses[responseCode] = rsp
-							}
-
-							if verbose {
-								fmt.Printf("rsp = %+v", rsp)
 							}
 						}
 					}
