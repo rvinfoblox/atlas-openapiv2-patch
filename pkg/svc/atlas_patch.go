@@ -239,7 +239,7 @@ The service-defined string used to identify a page of resources. A null value in
 			op.Parameters = fixedParams
 
 			if verbose {
-				fmt.Println("op.Responses.StatusCodeResponses != nil", op.Responses.StatusCodeResponses != nil)
+				fmt.Printf("op.Responses.StatusCodeResponses = %+v", op.Responses.StatusCodeResponses)
 			}
 
 			responseCode := responseCodesMap[on]
@@ -260,6 +260,7 @@ The service-defined string used to identify a page of resources. A null value in
 				if responseCode == 200 {
 					index = defaultResponseCodesMap[on]
 				}
+
 				if exists {
 					if verbose {
 						fmt.Println("201-300 exists - if true, 200 will be deleted: ", exists)
@@ -271,6 +272,8 @@ The service-defined string used to identify a page of resources. A null value in
 					if rsp.Schema == nil {
 						if on == "DELETE" {
 							rsp.Description = http.StatusText(responseCode)
+						} else if rsp.Description == "" {
+							rsp.Description = on + " operation response"
 						}
 						delete(op.Responses.StatusCodeResponses, index)
 						op.Responses.StatusCodeResponses[responseCode] = rsp
@@ -304,9 +307,9 @@ The service-defined string used to identify a page of resources. A null value in
 								rsp.Description = http.StatusText(responseCode)
 								if len(def.Properties) == 0 {
 									rsp.Schema = nil
-									delete(op.Responses.StatusCodeResponses, index)
 									op.Responses.StatusCodeResponses[responseCode] = rsp
 									delete(sw.Definitions, trim(rsp.Ref))
+									delete(op.Responses.StatusCodeResponses, index)
 									break
 								}
 								sw.Definitions[trim(rsp.Schema.Ref)] = schema
