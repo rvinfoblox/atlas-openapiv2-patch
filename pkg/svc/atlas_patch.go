@@ -123,7 +123,8 @@ func AtlasSwagger(b []byte, withPrivateMethods, withCustomAnnotations bool,
 
 		verbose := strings.Contains(pn, "option_group") ||
 			strings.Contains(pn, "contact") ||
-			strings.Contains(pn, "testdata")
+			strings.Contains(pn, "testdata") ||
+			strings.Contains(pn, "asm")
 
 		if verbose {
 			fmt.Println("~~~~~~~~~~~~~~~~~~~~~\npath", pn, "\n~~~~~~~~~~~~~")
