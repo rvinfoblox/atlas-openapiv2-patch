@@ -306,9 +306,6 @@ The service-defined string used to identify a page of resources. A null value in
 									break
 								}
 								rsp.Description = http.StatusText(responseCode)
-								if verbose {
-									fmt.Printf("rsp = %+v", rsp)
-								}
 								sw.Definitions[trim(rsp.Schema.Ref)] = schema
 								refs = append(refs, rsp.Schema.Ref)
 								delete(op.Responses.StatusCodeResponses, index)
@@ -318,6 +315,10 @@ The service-defined string used to identify a page of resources. A null value in
 								refs = append(refs, rsp.Schema.Ref)
 								delete(op.Responses.StatusCodeResponses, index)
 								op.Responses.StatusCodeResponses[responseCode] = rsp
+							}
+
+							if verbose {
+								fmt.Printf("rsp = %+v", rsp)
 							}
 						}
 					}
