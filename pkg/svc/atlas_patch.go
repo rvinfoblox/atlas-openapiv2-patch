@@ -109,6 +109,15 @@ func AtlasSwagger(b []byte, withPrivateMethods, withCustomAnnotations bool,
 	fixedPaths := map[string]spec.PathItem{}
 	privateMethodsOperations := make(map[string][]string, 0)
 	for pn, pi := range sw.Paths.Paths {
+		verbose :=
+			// strings.Contains(pn, "option_group") ||
+			// strings.Contains(pn, "contact") ||
+			// strings.Contains(pn, "testdata") ||
+			strings.Contains(pn, "asm")
+
+		if verbose {
+			fmt.Println("\n~~~~~~~~~~~~~~~~~~~~~\nInitial path", pn, "\n~~~~~~~~~~~~~")
+		}
 		var pnElements []string
 		for _, v := range strings.Split(pn, "/") {
 			if strings.HasSuffix(v, "id.resource_id}") ||
@@ -121,17 +130,12 @@ func AtlasSwagger(b []byte, withPrivateMethods, withCustomAnnotations bool,
 		}
 		pn := strings.Join(pnElements, "/")
 
-		verbose := strings.Contains(pn, "option_group") ||
-			strings.Contains(pn, "contact") ||
-			strings.Contains(pn, "testdata") ||
-			strings.Contains(pn, "asm")
-
 		if verbose {
-			fmt.Println("~~~~~~~~~~~~~~~~~~~~~\npath", pn, "\n~~~~~~~~~~~~~")
+			fmt.Println("~~~~~~~~~~~~~~~~~~~~~\npath", pn, "\n~~~~~~~~~~~~~\n", "pi", pi, "\n~~~~~~~~~~~~~")
 		}
 		for on, op := range pathItemAsMap(pi) {
 			if verbose {
-				fmt.Println("on, op", on, op != nil)
+				fmt.Println("on", on)
 			}
 			if op == nil {
 				continue
@@ -146,7 +150,7 @@ func AtlasSwagger(b []byte, withPrivateMethods, withCustomAnnotations bool,
 			var fixedParams []spec.Parameter
 			for _, param := range op.Parameters {
 				if verbose {
-					fmt.Printf("Param: %+v\n", param)
+					fmt.Printf("Param.name: %s, description: %s, schema: %+v\n", param.Name, param.Description, param.Schema)
 				}
 
 				// Fix Collection Operators
@@ -249,7 +253,8 @@ The service-defined string used to identify a page of resources. A null value in
 			op.Parameters = fixedParams
 
 			if verbose {
-				fmt.Printf("op.Responses.StatusCodeResponses = %+v", op.Responses.StatusCodeResponses)
+				fmt.Printf("op.parameters = %+v\n-----------\n", op.Parameters)
+				fmt.Printf("op.Responses.StatusCodeResponses = %+v\n------\n", op.Responses.StatusCodeResponses)
 			}
 
 			responseCode := responseCodesMap[on]
@@ -307,11 +312,11 @@ The service-defined string used to identify a page of resources. A null value in
 								rsp.Description = on + " operation response"
 							}
 
-							if verbose {
-								fmt.Println("responseCodes", responseCode)
-								fmt.Println("http.StatusText(responseCode)", http.StatusText(responseCode))
-								fmt.Println("len(def.Properties)", len(def.Properties))
-							}
+							// if verbose {
+							// 	fmt.Println("responseCodes", responseCode)
+							// 	fmt.Println("http.StatusText(responseCode)", http.StatusText(responseCode))
+							// 	fmt.Println("len(def.Properties)", len(def.Properties))
+							// }
 							switch on {
 							case "DELETE":
 								rsp.Description = http.StatusText(responseCode)
@@ -328,7 +333,7 @@ The service-defined string used to identify a page of resources. A null value in
 								op.Responses.StatusCodeResponses[responseCode] = rsp
 							default:
 								if verbose {
-									fmt.Printf("schema: %+v", schema)
+									fmt.Printf("Non - delete, schema: %+v\n------\n", schema)
 								}
 								sw.Definitions[trim(rsp.Schema.Ref)] = schema
 								refs = append(refs, rsp.Schema.Ref)
@@ -382,6 +387,7 @@ The service-defined string used to identify a page of resources. A null value in
 	for dn, v := range sw.Definitions {
 		// hidden definitions should become explicit.
 		if strings.HasPrefix(dn, "_") {
+			fmt.Printf("\n**** Going to delete definition: %s\n", dn)
 			sw.Definitions[strings.TrimPrefix(dn, "_")] = v
 			delete(sw.Definitions, dn)
 			seenRefs[dn] = true
@@ -410,6 +416,7 @@ The service-defined string used to identify a page of resources. A null value in
 		}
 
 		if IsPathEmpty(pi) {
+			fmt.Printf("path empty for pi: %+v\n---\n", pi)
 			delete(sw.Paths.Paths, pn)
 			continue
 		}
