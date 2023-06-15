@@ -222,6 +222,9 @@ The service-defined string used to identify a page of resources. A null value in
 					strings.HasSuffix(param.Name, ".id") {
 					param.Name = "id"
 					fixedParams = append(fixedParams, param)
+					if verbose {
+						fmt.Printf("has suffix path reached: %s", param.Name)
+					}
 				} else if strings.HasPrefix(param.Description, "tagging.api.") {
 					switch strings.TrimPrefix(param.Description, "tagging.api.") {
 					case "filtering":
