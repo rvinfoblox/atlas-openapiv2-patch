@@ -230,7 +230,8 @@ The service-defined string used to identify a page of resources. A null value in
 					}
 				} else {
 					// Gather ref in body.
-					if param.In == "body" && param.Schema != nil {
+					if param.Schema != nil {
+						// if param.In == "body" && param.Schema != nil {
 						refs = append(refs, param.Schema.Ref)
 					}
 					fixedParams = append(fixedParams, param)
