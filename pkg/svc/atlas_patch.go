@@ -317,7 +317,10 @@ The service-defined string used to identify a page of resources. A null value in
 								delete(op.Responses.StatusCodeResponses, index)
 								op.Responses.StatusCodeResponses[responseCode] = rsp
 							default:
-								sw.Definitions[trim(rsp.Schema.Ref)] = *rsp.Schema
+								if verbose {
+									fmt.Printf("schema: %+v", schema)
+								}
+								sw.Definitions[trim(rsp.Schema.Ref)] = schema
 								refs = append(refs, rsp.Schema.Ref)
 								delete(op.Responses.StatusCodeResponses, index)
 								op.Responses.StatusCodeResponses[responseCode] = rsp
