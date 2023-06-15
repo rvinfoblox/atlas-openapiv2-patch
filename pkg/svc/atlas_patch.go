@@ -145,6 +145,10 @@ func AtlasSwagger(b []byte, withPrivateMethods, withCustomAnnotations bool,
 
 			var fixedParams []spec.Parameter
 			for _, param := range op.Parameters {
+				if verbose {
+					fmt.Printf("Param: %+v\n", param)
+				}
+
 				// Fix Collection Operators
 				if strings.HasPrefix(param.Description, "atlas.api.") {
 					switch strings.TrimPrefix(param.Description, "atlas.api.") {
