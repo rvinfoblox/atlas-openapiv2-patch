@@ -80,15 +80,7 @@ func TestAtlasPatch(t *testing.T) {
   }
 }
 `
-	responseCodesMap := map[string]int{
-		"GET":    DefaultGetResponse,
-		"POST":   DefaultPostResponse,
-		"PUT":    DefaultPutResponse,
-		"PATCH":  DefaultPatchResponse,
-		"DELETE": DefaultDeleteResponse,
-	}
-
-	res := AtlasSwagger([]byte(input), false, false, responseCodesMap)
+	res := AtlasSwagger([]byte(input), false, false, DefaultResponseCodesMap)
 	var swSpec spec.Swagger
 	if err := json.Unmarshal([]byte(res), &swSpec); err != nil {
 		t.Fatalf("can't parse result back: %v", err)

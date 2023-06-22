@@ -41,7 +41,7 @@ var (
 	sw       spec.Swagger
 	seenRefs = map[string]bool{}
 
-	defaultResponseCodesMap = map[string]int{
+	DefaultResponseCodesMap = map[string]int{
 		"GET":    DefaultGetResponse,
 		"POST":   DefaultPostResponse,
 		"PUT":    DefaultPutResponse,
@@ -262,7 +262,12 @@ The service-defined string used to identify a page of resources. A null value in
 			if op.Responses.StatusCodeResponses != nil {
 				// check if StatusCodeResponses has 201 >= x < 300 then delete 200 and don't go to isNilRef check
 				exists := false
-				if responseCode != 200 {
+				// defaultResponseCode := 200
+				// if responseCode == 200 {
+				defaultResponseCode := DefaultResponseCodesMap[on]
+				// }
+
+				if responseCode != defaultResponseCode {
 					for code := range op.Responses.StatusCodeResponses {
 						if code >= 201 && code < 300 {
 							exists = true
@@ -271,26 +276,21 @@ The service-defined string used to identify a page of resources. A null value in
 					}
 				}
 
-				index := 200
-				if responseCode == 200 {
-					index = defaultResponseCodesMap[on]
-				}
-
 				if exists {
 					if verbose {
 						fmt.Println("201-300 exists - if true, 200 will be deleted: ", exists)
 					}
-					delete(op.Responses.StatusCodeResponses, index)
+					delete(op.Responses.StatusCodeResponses, defaultResponseCode)
 				} else {
-					rsp := op.Responses.StatusCodeResponses[index]
-
+					rsp := op.Responses.StatusCodeResponses[defaultResponseCode]
 					if rsp.Schema == nil {
 						if on == "DELETE" {
+							// Always overwrite for the Delete case
 							rsp.Description = http.StatusText(responseCode)
 						} else if rsp.Description == "" {
 							rsp.Description = on + " operation response"
 						}
-						delete(op.Responses.StatusCodeResponses, index)
+						delete(op.Responses.StatusCodeResponses, defaultResponseCode)
 						op.Responses.StatusCodeResponses[responseCode] = rsp
 					} else {
 						if verbose {
@@ -312,32 +312,30 @@ The service-defined string used to identify a page of resources. A null value in
 								rsp.Description = on + " operation response"
 							}
 
-							// if verbose {
-							// 	fmt.Println("responseCodes", responseCode)
-							// 	fmt.Println("http.StatusText(responseCode)", http.StatusText(responseCode))
-							// 	fmt.Println("len(def.Properties)", len(def.Properties))
-							// }
 							switch on {
 							case "DELETE":
-								rsp.Description = http.StatusText(responseCode)
 								if len(def.Properties) == 0 {
+									rsp.Description = http.StatusText(responseCode)
 									rsp.Schema = nil
+									delete(op.Responses.StatusCodeResponses, defaultResponseCode)
 									op.Responses.StatusCodeResponses[responseCode] = rsp
 									delete(sw.Definitions, trim(rsp.Ref))
-									delete(op.Responses.StatusCodeResponses, index)
 									break
 								}
 								sw.Definitions[trim(rsp.Schema.Ref)] = schema
 								refs = append(refs, rsp.Schema.Ref)
-								delete(op.Responses.StatusCodeResponses, index)
+								// delete(op.Responses.StatusCodeResponses, index)
 								op.Responses.StatusCodeResponses[responseCode] = rsp
 							default:
 								if verbose {
 									fmt.Printf("Non - delete, schema: %+v\n------\n", schema)
 								}
+								if rsp.Description == "" {
+									rsp.Description = on + " operation response"
+								}
 								sw.Definitions[trim(rsp.Schema.Ref)] = schema
 								refs = append(refs, rsp.Schema.Ref)
-								delete(op.Responses.StatusCodeResponses, index)
+								delete(op.Responses.StatusCodeResponses, defaultResponseCode)
 								op.Responses.StatusCodeResponses[responseCode] = rsp
 							}
 						}
@@ -387,7 +385,6 @@ The service-defined string used to identify a page of resources. A null value in
 	for dn, v := range sw.Definitions {
 		// hidden definitions should become explicit.
 		if strings.HasPrefix(dn, "_") {
-			fmt.Printf("\n**** Going to delete definition: %s\n", dn)
 			sw.Definitions[strings.TrimPrefix(dn, "_")] = v
 			delete(sw.Definitions, dn)
 			seenRefs[dn] = true
@@ -416,7 +413,6 @@ The service-defined string used to identify a page of resources. A null value in
 		}
 
 		if IsPathEmpty(pi) {
-			fmt.Printf("path empty for pi: %+v\n---\n", pi)
 			delete(sw.Paths.Paths, pn)
 			continue
 		}
