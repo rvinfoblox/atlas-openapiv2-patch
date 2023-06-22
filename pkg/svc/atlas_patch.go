@@ -273,7 +273,7 @@ The service-defined string used to identify a page of resources. A null value in
 
 				index := 200
 				if responseCode == 200 {
-					index = defaultResponseCodesMap[on]
+					index = DefaultResponseCodesMap[on]
 				}
 
 				if exists {
