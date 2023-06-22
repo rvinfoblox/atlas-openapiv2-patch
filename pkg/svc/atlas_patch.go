@@ -262,12 +262,7 @@ The service-defined string used to identify a page of resources. A null value in
 			if op.Responses.StatusCodeResponses != nil {
 				// check if StatusCodeResponses has 201 >= x < 300 then delete 200 and don't go to isNilRef check
 				exists := false
-				// defaultResponseCode := 200
-				// if responseCode == 200 {
-				defaultResponseCode := DefaultResponseCodesMap[on]
-				// }
-
-				if responseCode != defaultResponseCode {
+				if responseCode != 200 {
 					for code := range op.Responses.StatusCodeResponses {
 						if code >= 201 && code < 300 {
 							exists = true
@@ -276,13 +271,19 @@ The service-defined string used to identify a page of resources. A null value in
 					}
 				}
 
+				index := 200
+				if responseCode == 200 {
+					index = defaultResponseCodesMap[on]
+				}
+
 				if exists {
 					if verbose {
 						fmt.Println("201-300 exists - if true, 200 will be deleted: ", exists)
 					}
-					delete(op.Responses.StatusCodeResponses, defaultResponseCode)
+					delete(op.Responses.StatusCodeResponses, index)
 				} else {
-					rsp := op.Responses.StatusCodeResponses[defaultResponseCode]
+					rsp := op.Responses.StatusCodeResponses[index]
+
 					if rsp.Schema == nil {
 						if on == "DELETE" {
 							// Always overwrite for the Delete case
@@ -290,7 +291,7 @@ The service-defined string used to identify a page of resources. A null value in
 						} else if rsp.Description == "" {
 							rsp.Description = on + " operation response"
 						}
-						delete(op.Responses.StatusCodeResponses, defaultResponseCode)
+						delete(op.Responses.StatusCodeResponses, index)
 						op.Responses.StatusCodeResponses[responseCode] = rsp
 					} else {
 						if verbose {
@@ -314,28 +315,25 @@ The service-defined string used to identify a page of resources. A null value in
 
 							switch on {
 							case "DELETE":
+								rsp.Description = http.StatusText(responseCode)
 								if len(def.Properties) == 0 {
-									rsp.Description = http.StatusText(responseCode)
 									rsp.Schema = nil
-									delete(op.Responses.StatusCodeResponses, defaultResponseCode)
 									op.Responses.StatusCodeResponses[responseCode] = rsp
 									delete(sw.Definitions, trim(rsp.Ref))
+									delete(op.Responses.StatusCodeResponses, index)
 									break
 								}
 								sw.Definitions[trim(rsp.Schema.Ref)] = schema
 								refs = append(refs, rsp.Schema.Ref)
-								// delete(op.Responses.StatusCodeResponses, index)
+								delete(op.Responses.StatusCodeResponses, index)
 								op.Responses.StatusCodeResponses[responseCode] = rsp
 							default:
 								if verbose {
 									fmt.Printf("Non - delete, schema: %+v\n------\n", schema)
 								}
-								if rsp.Description == "" {
-									rsp.Description = on + " operation response"
-								}
 								sw.Definitions[trim(rsp.Schema.Ref)] = schema
 								refs = append(refs, rsp.Schema.Ref)
-								delete(op.Responses.StatusCodeResponses, defaultResponseCode)
+								delete(op.Responses.StatusCodeResponses, index)
 								op.Responses.StatusCodeResponses[responseCode] = rsp
 							}
 						}
