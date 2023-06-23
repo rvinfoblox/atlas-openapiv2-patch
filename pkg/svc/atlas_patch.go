@@ -290,23 +290,14 @@ The service-defined string used to identify a page of resources. A null value in
 						if on == "DELETE" {
 							// Always overwrite for the Delete case
 							rsp.Description = http.StatusText(responseCode)
-							// otherRsp := op.Responses.StatusCodeResponses[204]
-							// rsp.Schema = otherRsp.Schema
 						} else if rsp.Description == "" {
 							rsp.Description = "A successful response."
-							// otherRsp := op.Responses.StatusCodeResponses[201]
-							// rsp.Schema = otherRsp.Schema
 						}
-						if op.Responses.StatusCodeResponses[index].Schema != nil {
-							delete(op.Responses.StatusCodeResponses, index)
-							op.Responses.StatusCodeResponses[responseCode] = rsp
-						}
-						// delete(sw.Definitions, trim(rsp.Ref))
-						// delete(op.Responses.StatusCodeResponses, index)
-						// op.Responses.StatusCodeResponses[responseCode] = rsp
-					}
-
-					if rsp.Schema != nil && !isNilRef(rsp.Schema.Ref) {
+						// if op.Responses.StatusCodeResponses[index].Schema != nil {
+						delete(op.Responses.StatusCodeResponses, index)
+						op.Responses.StatusCodeResponses[responseCode] = rsp
+						// }
+					} else if !isNilRef(rsp.Schema.Ref) {
 						s, _, err := rsp.Schema.Ref.GetPointer().Get(sw)
 						if err != nil {
 							panic(err)
