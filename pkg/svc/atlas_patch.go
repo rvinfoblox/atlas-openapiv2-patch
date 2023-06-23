@@ -298,8 +298,8 @@ The service-defined string used to identify a page of resources. A null value in
 							// rsp.Schema = otherRsp.Schema
 						}
 						if op.Responses.StatusCodeResponses[index].Schema != nil {
-							op.Responses.StatusCodeResponses[responseCode] = op.Responses.StatusCodeResponses[index]
 							delete(op.Responses.StatusCodeResponses, index)
+							op.Responses.StatusCodeResponses[responseCode] = rsp
 						}
 						// delete(sw.Definitions, trim(rsp.Ref))
 						// delete(op.Responses.StatusCodeResponses, index)
