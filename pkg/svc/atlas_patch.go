@@ -280,9 +280,9 @@ The service-defined string used to identify a page of resources. A null value in
 					if verbose {
 						fmt.Println("201-300 exists - if true, 200 will be deleted: ", exists)
 					}
-					if responseCode != 200 {
-						delete(op.Responses.StatusCodeResponses, index)
-					}
+					// if responseCode != 200 {
+					delete(op.Responses.StatusCodeResponses, index)
+					// }
 				} else {
 					rsp := op.Responses.StatusCodeResponses[index]
 
