@@ -284,60 +284,60 @@ The service-defined string used to identify a page of resources. A null value in
 				} else {
 					rsp := op.Responses.StatusCodeResponses[index]
 
-					if rsp.Schema == nil {
-						if on == "DELETE" {
-							// Always overwrite for the Delete case
-							rsp.Description = http.StatusText(responseCode)
-						} else if rsp.Description == "" {
+					// if rsp.Schema == nil {
+					// 	fmt.Println("parameters: ", op.Parameters)
+					// 	if rsp.Description == "" {
+					// 		if on == "DELETE" {
+					// 			// Always overwrite for the Delete case
+					// 			rsp.Description = http.StatusText(responseCode)
+					// 		} else {
+					// 			rsp.Description = on + " operation response"
+					// 		}
+					// 	}
+					// 	delete(op.Responses.StatusCodeResponses, index)
+					// 	op.Responses.StatusCodeResponses[responseCode] = rsp
+					// } else {
+					if rsp.Schema != nil && !isNilRef(rsp.Schema.Ref) {
+						s, _, err := rsp.Schema.Ref.GetPointer().Get(sw)
+						if err != nil {
+							panic(err)
+						}
+
+						schema := s.(spec.Schema)
+						if schema.Properties == nil {
+							schema.Properties = map[string]spec.Schema{}
+						}
+
+						def := sw.Definitions[trim(rsp.Schema.Ref)]
+						if rsp.Description == "" {
 							rsp.Description = on + " operation response"
 						}
-						delete(op.Responses.StatusCodeResponses, index)
-						op.Responses.StatusCodeResponses[responseCode] = rsp
-					} else {
-						if verbose {
-							fmt.Println("isNilRef(rsp.Schema.Ref)", isNilRef(rsp.Schema.Ref))
-						}
-						if !isNilRef(rsp.Schema.Ref) {
-							s, _, err := rsp.Schema.Ref.GetPointer().Get(sw)
-							if err != nil {
-								panic(err)
-							}
 
-							schema := s.(spec.Schema)
-							if schema.Properties == nil {
-								schema.Properties = map[string]spec.Schema{}
-							}
-
-							def := sw.Definitions[trim(rsp.Schema.Ref)]
-							if rsp.Description == "" {
-								rsp.Description = on + " operation response"
-							}
-
-							switch on {
-							case "DELETE":
-								rsp.Description = http.StatusText(responseCode)
-								if len(def.Properties) == 0 {
-									rsp.Schema = nil
-									op.Responses.StatusCodeResponses[responseCode] = rsp
-									delete(sw.Definitions, trim(rsp.Ref))
-									delete(op.Responses.StatusCodeResponses, index)
-									break
-								}
-								sw.Definitions[trim(rsp.Schema.Ref)] = schema
-								refs = append(refs, rsp.Schema.Ref)
-								delete(op.Responses.StatusCodeResponses, index)
+						switch on {
+						case "DELETE":
+							rsp.Description = http.StatusText(responseCode)
+							if len(def.Properties) == 0 {
+								rsp.Schema = nil
 								op.Responses.StatusCodeResponses[responseCode] = rsp
-							default:
-								if verbose {
-									fmt.Printf("Non - delete, schema: %+v\n------\n", schema)
-								}
-								sw.Definitions[trim(rsp.Schema.Ref)] = schema
-								refs = append(refs, rsp.Schema.Ref)
+								delete(sw.Definitions, trim(rsp.Ref))
 								delete(op.Responses.StatusCodeResponses, index)
-								op.Responses.StatusCodeResponses[responseCode] = rsp
+								break
 							}
+							sw.Definitions[trim(rsp.Schema.Ref)] = schema
+							refs = append(refs, rsp.Schema.Ref)
+							delete(op.Responses.StatusCodeResponses, index)
+							op.Responses.StatusCodeResponses[responseCode] = rsp
+						default:
+							if verbose {
+								fmt.Printf("Non - delete, schema: %+v\n------\n", schema)
+							}
+							sw.Definitions[trim(rsp.Schema.Ref)] = schema
+							refs = append(refs, rsp.Schema.Ref)
+							delete(op.Responses.StatusCodeResponses, index)
+							op.Responses.StatusCodeResponses[responseCode] = rsp
 						}
 					}
+					// }
 				}
 			}
 		}
