@@ -280,19 +280,7 @@ The service-defined string used to identify a page of resources. A null value in
 					if verbose {
 						fmt.Println("201-300 exists - if true, 200 will be deleted: ", exists)
 					}
-					// delete(op.Responses.StatusCodeResponses, index)
-					rsp := op.Responses.StatusCodeResponses[index]
-
-					if on == "DELETE" {
-						// Always overwrite for the Delete case
-						rsp.Description = http.StatusText(responseCode)
-					} else if rsp.Description == "" {
-						rsp.Description = "A successful response."
-					}
-					if op.Responses.StatusCodeResponses[index].Schema != nil {
-						delete(op.Responses.StatusCodeResponses, index)
-						op.Responses.StatusCodeResponses[responseCode] = rsp
-					}
+					delete(op.Responses.StatusCodeResponses, index)
 				} else {
 					rsp := op.Responses.StatusCodeResponses[index]
 
@@ -303,7 +291,7 @@ The service-defined string used to identify a page of resources. A null value in
 						} else if rsp.Description == "" {
 							rsp.Description = "A successful response."
 						}
-						if op.Responses.StatusCodeResponses[index].Schema != nil {
+						if op.Responses.StatusCodeResponses[index].Description != "" {
 							delete(op.Responses.StatusCodeResponses, index)
 							op.Responses.StatusCodeResponses[responseCode] = rsp
 						}

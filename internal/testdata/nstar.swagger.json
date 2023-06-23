@@ -1,0 +1,414 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "OpenAPI V2 Northstar use of Atlas Patch Test",
+    "version": "2.0",
+    "contact": {
+      "name": "John Doe",
+      "url": "https://github.com/infobloxprivate/atlas-contacts-app",
+      "email": "jdoe@infoblox.com"
+    }
+  },
+  "tags": [
+    {
+      "name": "NstarService"
+    }
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/ipam/address_block": {
+      "get": {
+        "description": "Use this method to retrieve __AddressBlock__ objects.\nThe __AddressBlock__ object allows a uniform representation of the address space segmentation, supporting functions such as administrative grouping, routing aggregation, delegation etc.",
+        "tags": [
+          "address_block"
+        ],
+        "summary": "Retrieve the address blocks.",
+        "operationId": "address_blockList",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "\n\nA collection of response resources can be transformed by specifying a set of JSON tags to be returned. For a “flat” resource, the tag name is straightforward. If field selection is allowed on non-flat hierarchical resources, the service should implement a qualified naming scheme such as dot-qualification to reference data down the hierarchy. If a resource does not have the specified tag, the tag does not appear in the output resource.\n\nSpecify this parameter as a comma-separated list of JSON tag names.\n\n\t\t\t\t\t\t",
+            "name": "_fields",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "\n\nA collection of response resources can be filtered by a logical expression string that includes JSON tag references to values in each resource, literal values, and logical operators. If a resource does not have the specified tag, its value is assumed to be null.\n\nLiteral values include numbers (integer and floating-point), and quoted (both single- or double-quoted) literal strings, and 'null'. The following operators are commonly used in filter expressions:\n\n|  Op   |  Description               | \n|  --   |  -----------               | \n|  ==   |  Equal                     | \n|  !=   |  Not Equal                 | \n|  \u003e    |  Greater Than              | \n|   \u003e=  |  Greater Than or Equal To  | \n|  \u003c    |  Less Than                 | \n|  \u003c=   |  Less Than or Equal To     | \n|  and  |  Logical AND               | \n|  ~    |  Matches Regex             | \n|  !~   |  Does Not Match Regex      | \n|  or   |  Logical OR                | \n|  not  |  Logical NOT               | \n|  ()   |  Groupping Operators       |\n\n\t\t\t\t\t\t",
+            "name": "_filter",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "\n\nThe integer index (zero-origin) of the offset into a collection of resources. If omitted or null the value is assumed to be '0'.\n\n\t\t\t\t\t\t\t",
+            "name": "_offset",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "description": "\n\nThe integer number of resources to be returned in the response. The service may impose maximum value. If omitted the service may impose a default value.\n\n\t\t\t\t\t\t\t",
+            "name": "_limit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "\n\nThe service-defined string used to identify a page of resources. A null value indicates the first page.\n\n\t\t\t\t\t\t\t",
+            "name": "_page_token",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "\n\nA collection of response resources can be sorted by their JSON tags. For a 'flat' resource, the tag name is straightforward. If sorting is allowed on non-flat hierarchical resources, the service should implement a qualified naming scheme such as dot-qualification to reference data down the hierarchy. If a resource does not have the specified tag, its value is assumed to be null.)\n\nSpecify this parameter as a comma-separated list of JSON tag names. The sort direction can be specified by a suffix separated by whitespace before the tag name. The suffix 'asc' sorts the data in ascending order. The suffix 'desc' sorts the data in descending order. If no suffix is specified the data is sorted in ascending order.\n\n\t\t\t\t\t\t",
+            "name": "_order_by",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "This parameter is used for sorting by tags.",
+            "name": "_torder_by",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "This parameter is used for filtering by tags.",
+            "name": "_tfilter",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "GET operation response",
+            "schema": {
+              "$ref": "#/definitions/ipamsvcListAddressBlockResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Use this method to create an __AddressBlock__ object.\nThe __AddressBlock__ object allows a uniform representation of the address space segmentation, supporting functions such as administrative grouping, routing aggregation, delegation etc.",
+        "tags": [
+          "address_block"
+        ],
+        "summary": "Create the address block.",
+        "operationId": "address_blockCreate",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ipamsvcAddressBlock"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "POST operation response",
+            "schema": {
+              "$ref": "#/definitions/ipamsvcCreateAddressBlockResponse"
+            }
+          }
+        }
+      }
+    },
+    "/ipam/address_block/{id}": {
+      "get": {
+        "description": "Use this method to retrieve an __AddressBlock__ object.\nThe __AddressBlock__ object allows a uniform representation of the address space segmentation, supporting functions such as administrative grouping, routing aggregation, delegation etc.",
+        "tags": [
+          "address_block"
+        ],
+        "summary": "Retrieve the address block.",
+        "operationId": "address_blockRead",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "An application specific resource identity of a resource",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "\n\nA collection of response resources can be transformed by specifying a set of JSON tags to be returned. For a “flat” resource, the tag name is straightforward. If field selection is allowed on non-flat hierarchical resources, the service should implement a qualified naming scheme such as dot-qualification to reference data down the hierarchy. If a resource does not have the specified tag, the tag does not appear in the output resource.\n\nSpecify this parameter as a comma-separated list of JSON tag names.\n\n\t\t\t\t\t\t",
+            "name": "_fields",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "GET operation response",
+            "schema": {
+              "$ref": "#/definitions/ipamsvcReadAddressBlockResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Use this method to move an __AddressBlock__ object to the recycle bin.\nThe __AddressBlock__ object allows a uniform representation of the address space segmentation, supporting functions such as administrative grouping, routing aggregation, delegation etc.",
+        "tags": [
+          "address_block"
+        ],
+        "summary": "Move the address block to the recycle bin.",
+        "operationId": "address_blockDelete",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "An application specific resource identity of a resource",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      },
+      "patch": {
+        "description": "Use this method to update an __AddressBlock__ object.\nThe __AddressBlock__ object allows a uniform representation of the address space segmentation, supporting functions such as administrative grouping, routing aggregation, delegation etc.",
+        "tags": [
+          "address_block"
+        ],
+        "summary": "Update the address block.",
+        "operationId": "address_blockUpdate",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "An application specific resource identity of a resource",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ipamsvcAddressBlock"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "PATCH operation response",
+            "schema": {
+              "$ref": "#/definitions/ipamsvcUpdateAddressBlockResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ipamsvcListAddressBlockResponse": {
+      "description": "The response format to retrieve __AddressBlock__ objects.",
+      "type": "object",
+      "title": "ListAddressBlockResponse",
+      "properties": {
+        "results": {
+          "description": "A list of AddressBlock objects.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ipamsvcAddressBlock"
+          }
+        }
+      }
+    },
+    "ipamsvcReadAddressBlockResponse": {
+      "description": "The response format to retrieve the __AddressBlock__ object.",
+      "type": "object",
+      "title": "ReadAddressBlockResponse",
+      "properties": {
+        "result": {
+          "description": "The AddressBlock object.",
+          "$ref": "#/definitions/ipamsvcAddressBlock"
+        }
+      }
+    },
+    "ipamsvcCreateAddressBlockResponse": {
+      "description": "The response format to create the __AddressBlock__ object.",
+      "type": "object",
+      "title": "CreateAddressBlockResponse",
+      "properties": {
+        "result": {
+          "description": "The created AddressBlock object.",
+          "$ref": "#/definitions/ipamsvcAddressBlock"
+        }
+      }
+    },
+    "ipamsvcUpdateAddressBlockResponse": {
+      "description": "The response format to update the __AddressBlock__ object.",
+      "type": "object",
+      "title": "UpdateAddressBlockResponse",
+      "properties": {
+        "result": {
+          "description": "The AddressBlock object.",
+          "$ref": "#/definitions/ipamsvcAddressBlock"
+        }
+      }
+    },
+    "ipamsvcAddressBlock": {
+      "description": "An __AddressBlock__ object (_ipam/address_block_) is a set of contiguous IP addresses in the same IP space with no gap, expressed as a CIDR block. Address blocks are hierarchical and may be parented to other address blocks as long as the parent block fully contains the child and no sibling overlaps. Top level address blocks are parented to an IP space.",
+      "type": "object",
+      "title": "AddressBlock",
+      "required": [
+        "space",
+        "address"
+      ],
+      "properties": {
+        "address": {
+          "description": "The address field in form “a.b.c.d/n” where the “/n” may be omitted. In this case, the CIDR value must be defined in the _cidr_ field. When reading, the _address_ field is always in the form “a.b.c.d”.",
+          "type": "string"
+        },
+        "asm_scope_flag": {
+          "description": "Incremented by 1 if the IP address usage limits for automated scope management are exceeded for any subnets in the address block.",
+          "type": "integer",
+          "format": "int64",
+          "readOnly": true
+        },
+        "cidr": {
+          "description": "The CIDR of the address block. This is required, if _address_ does not specify it in its input.",
+          "type": "integer",
+          "format": "int64",
+          "maximum": 32,
+          "minimum": 1
+        },
+        "comment": {
+          "description": "The description for the address block. May contain 0 to 1024 characters. Can include UTF-8.",
+          "type": "string"
+        },
+        "created_at": {
+          "description": "Time when the object has been created.",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "ddns_client_update": {
+          "description": "Controls who does the DDNS updates.\n\nValid values are:\n* _client_: DHCP server updates DNS if requested by client.\n* _server_: DHCP server always updates DNS, overriding an update request from the client, unless the client requests no updates.\n* _ignore_: DHCP server always updates DNS, even if the client says not to.\n* _over_client_update_: Same as _server_. DHCP server always updates DNS, overriding an update request from the client, unless the client requests no updates.\n* _over_no_update_: DHCP server updates DNS even if the client requests that no updates be done. If the client requests to do the update, DHCP server allows it.\n\nDefaults to _client_.",
+          "type": "string"
+        },
+        "ddns_conflict_resolution_mode": {
+          "description": "The mode used for resolving conflicts while performing DDNS updates.\n\nValid values are:\n* _check_with_dhcid_: It includes adding a DHCID record and checking that record via conflict detection as per RFC 4703.\n* _no_check_with_dhcid_: This will ignore conflict detection but add a DHCID record when creating/updating an entry.\n* _check_exists_with_dhcid_: This will check if there is an existing DHCID record but does not verify the value of the record matches the update. This will also update the DHCID record for the entry.\n* _no_check_without_dhcid_: This ignores conflict detection and will not add a DHCID record when creating/updating a DDNS entry.\n\nDefaults to _check_with_dhcid_.",
+          "type": "string"
+        },
+        "ddns_domain": {
+          "description": "The domain suffix for DDNS updates. FQDN, may be empty.\n\nDefaults to empty.",
+          "type": "string"
+        },
+        "ddns_generate_name": {
+          "description": "Indicates if DDNS needs to generate a hostname when not supplied by the client.\n\nDefaults to _false_.",
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "ddns_generated_prefix": {
+          "description": "The prefix used in the generation of an FQDN.\n\nWhen generating a name, DHCP server will construct the name in the format: [ddns-generated-prefix]-[address-text].[ddns-qualifying-suffix].\nwhere address-text is simply the lease IP address converted to a hyphenated string.\n\nDefaults to \"myhost\".",
+          "type": "string"
+        },
+        "ddns_send_updates": {
+          "description": "Determines if DDNS updates are enabled at the address block level.\nDefaults to _true_.",
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "ddns_update_on_renew": {
+          "description": "Instructs the DHCP server to always update the DNS information when a lease is renewed even if its DNS information has not changed.\n\nDefaults to _false_.",
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "ddns_use_conflict_resolution": {
+          "description": "When true, DHCP server will apply conflict resolution, as described in RFC 4703, when attempting to fulfill the update request.\n\nWhen false, DHCP server will simply attempt to update the DNS entries per the request, regardless of whether or not they conflict with existing entries owned by other DHCP4 clients.\n\nDefaults to _true_.",
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "discovery_attrs": {
+          "description": "The discovery attributes for this address block in JSON format.",
+          "type": "object",
+          "additionalProperties": false
+        },
+        "discovery_metadata": {
+          "description": "The discovery metadata for this address block in JSON format.",
+          "type": "object",
+          "additionalProperties": false
+        },
+        "header_option_filename": {
+          "description": "The configuration for header option filename field.",
+          "type": "string"
+        },
+        "header_option_server_address": {
+          "description": "The configuration for header option server address field.",
+          "type": "string"
+        },
+        "header_option_server_name": {
+          "description": "The configuration for header option server name field.",
+          "type": "string"
+        },
+        "hostname_rewrite_char": {
+          "description": "The character to replace non-matching characters with, when hostname rewrite is enabled.\n\nAny single ASCII character or no character if the invalid characters should be removed without replacement.\n\nDefaults to \"-\".",
+          "type": "string"
+        },
+        "hostname_rewrite_enabled": {
+          "description": "Indicates if client supplied hostnames will be rewritten prior to DDNS update by replacing every character that does not match _hostname_rewrite_regex_ by _hostname_rewrite_char_.\n\nDefaults to _false_.",
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "hostname_rewrite_regex": {
+          "description": "The regex bracket expression to match valid characters.\n\nMust begin with \"[\" and end with \"]\" and be a compilable POSIX regex.\n\nDefaults to \"[^a-zA-Z0-9_.]\".",
+          "type": "string"
+        },
+        "id": {
+          "description": "The resource identifier.",
+          "type": "string",
+          "readOnly": true
+        },
+        "inheritance_parent": {
+          "description": "The resource identifier.",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the address block. May contain 1 to 256 characters. Can include UTF-8.",
+          "type": "string"
+        },
+        "parent": {
+          "description": "The resource identifier.",
+          "type": "string"
+        },
+        "protocol": {
+          "description": "The type of protocol of address block (_ip4_ or _ip6_).",
+          "type": "string",
+          "readOnly": true
+        },
+        "space": {
+          "description": "The resource identifier.",
+          "type": "string"
+        },
+        "tags": {
+          "description": "The tags for the address block in JSON format.",
+          "type": "object",
+          "additionalProperties": false
+        },
+        "updated_at": {
+          "description": "Time when the object has been updated. Equals to _created_at_ if not updated after creation.",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "usage": {
+          "description": "The usage is a combination of indicators, each tracking a specific associated use. Listed below are usage indicators with their meaning:\n usage indicator        | description\n ---------------------- | --------------------------------\n _DISCOVERED_           |  AddressBlock was discovered by some network discovery probe like Network Insight in NIOS.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "readOnly": true
+        }
+      }
+    }
+  }
+}

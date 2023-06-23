@@ -12,13 +12,14 @@ import (
 )
 
 const (
-	succeed           = "\u2713"
-	failed            = "\u2717"
-	red               = "\033[31m"
-	green             = "\033[32m"
-	yellow            = "\033[33m"
-	reset             = "\033[0m"
-	sampleSwaggerFile = "../../internal/testdata/atlaspatch.swagger.json"
+	succeed                = "\u2713"
+	failed                 = "\u2717"
+	red                    = "\033[31m"
+	green                  = "\033[32m"
+	yellow                 = "\033[33m"
+	reset                  = "\033[0m"
+	sampleAtlasSwaggerFile = "../../internal/testdata/atlaspatch.swagger.json"
+	sampleNstarSwaggerFile = "../../internal/testdata/nstar.swagger.json"
 )
 
 func deepCompare(file1, file2 string) (bool, error) {
@@ -55,18 +56,20 @@ func deepCompare(file1, file2 string) (bool, error) {
 		}
 
 		if !bytes.Equal(b1, b2) {
-			fmt.Printf("File1 %s:\n%s\n-------------\n\nFile2 %s:\n%s\n",
-				file1, string(b1),
-				file2, string(b2))
+			fmt.Printf("File1 %s:\n%s\n-------------\n\nFile2 %s:\n",
+				file1, string(b1), file2)
+			fmt.Println()
+			// fmt.Printf("File1 %s:\n%s\n-------------\n\nFile2 %s:\n%s\n",
+			// 	file1, string(b1), file2, string(b2))
 			return false, nil
 		}
 	}
 }
 
-func createFiles(fileNames []string) error {
+func createFiles(inFile string, fileNames []string) error {
 	for _, file := range fileNames {
 		var f []byte
-		f, err := ioutil.ReadFile(sampleSwaggerFile)
+		f, err := ioutil.ReadFile(inFile)
 		if err != nil {
 			return err
 		}
@@ -100,6 +103,7 @@ func Test_run(t *testing.T) {
 		name           string
 		args           args
 		wantErr        bool
+		inputFile      string
 		wantFile       string
 		generatedFiles []string
 	}{
@@ -111,6 +115,7 @@ func Test_run(t *testing.T) {
 				withCustomAnnotations: false,
 				files:                 []string{"../../internal/testdata/atlaspatch.emitted.swagger.json"},
 			},
+			inputFile:      sampleAtlasSwaggerFile,
 			wantFile:       "../../internal/testdata/atlaspatch.wanted.swagger.json",
 			generatedFiles: []string{"../../internal/testdata/atlaspatch.emitted.swagger.json"},
 		},
@@ -122,6 +127,7 @@ func Test_run(t *testing.T) {
 				withCustomAnnotations: true,
 				files:                 []string{"../../internal/testdata/atlaspatch.emitted.swagger.json"},
 			},
+			inputFile:      sampleAtlasSwaggerFile,
 			wantFile:       "../../internal/testdata/atlaspatch.wanted.swagger.json",
 			generatedFiles: []string{"../../internal/testdata/atlaspatch.emitted.swagger.json"},
 		},
@@ -135,6 +141,7 @@ func Test_run(t *testing.T) {
 				withDeleteResponse: 305,
 				files:              []string{"../../internal/testdata/atlaspatch.emitted.customresponses.swagger.json"},
 			},
+			inputFile:      sampleAtlasSwaggerFile,
 			wantFile:       "../../internal/testdata/atlaspatch.wanted.customresponses.swagger.json",
 			generatedFiles: []string{"../../internal/testdata/atlaspatch.emitted.customresponses.swagger.json"},
 		},
@@ -148,8 +155,23 @@ func Test_run(t *testing.T) {
 				withDeleteResponse: 200,
 				files:              []string{"../../internal/testdata/atlaspatch.emitted.customresponses2.swagger.json"},
 			},
+			inputFile:      sampleAtlasSwaggerFile,
 			wantFile:       "../../internal/testdata/atlaspatch.wanted.customresponses2.swagger.json",
 			generatedFiles: []string{"../../internal/testdata/atlaspatch.emitted.customresponses2.swagger.json"},
+		},
+		{
+			name:    "nstar - with custom HTTP response codes - use 200 response codes for all APIs for testing",
+			wantErr: false,
+			args: args{
+				withPostResponse:   200,
+				withPutResponse:    200,
+				withPatchResponse:  200,
+				withDeleteResponse: 200,
+				files:              []string{"../../internal/testdata/nstar.emitted.swagger.json"},
+			},
+			inputFile:      sampleNstarSwaggerFile,
+			wantFile:       "../../internal/testdata/nstar.wanted.swagger.json",
+			generatedFiles: []string{"../../internal/testdata/nstar.emitted.swagger.json"},
 		},
 	}
 	reg := descriptor.NewRegistry()
@@ -170,7 +192,7 @@ func Test_run(t *testing.T) {
 			if tt.args.withDeleteResponse > 0 {
 				reg.SetDeleteResponse(tt.args.withDeleteResponse)
 			}
-			err := createFiles(tt.args.files)
+			err := createFiles(tt.inputFile, tt.args.files)
 			defer deleteFiles(tt.generatedFiles)
 			defer deleteFiles(tt.args.files)
 			if err != nil {
