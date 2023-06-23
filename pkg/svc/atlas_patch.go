@@ -150,7 +150,7 @@ func AtlasSwagger(b []byte, withPrivateMethods, withCustomAnnotations bool,
 			var fixedParams []spec.Parameter
 			for _, param := range op.Parameters {
 				if verbose {
-					fmt.Printf("Param.name: %s, description: %s, schema: %+v\n", param.Name, param.Description, param.Schema)
+					fmt.Printf("Param.name: %s", param.Name)
 				}
 
 				// Fix Collection Operators
@@ -262,14 +262,14 @@ The service-defined string used to identify a page of resources. A null value in
 			if op.Responses.StatusCodeResponses != nil {
 				// check if StatusCodeResponses has 201 >= x < 300 then delete 200 and don't go to isNilRef check
 				exists := false
-				if responseCode != 200 {
-					for code := range op.Responses.StatusCodeResponses {
-						if code >= 201 && code < 300 {
-							exists = true
-						}
-						break
+				// if responseCode != 200 {
+				for code := range op.Responses.StatusCodeResponses {
+					if code >= 201 && code < 300 {
+						exists = true
 					}
+					break
 				}
+				// }
 
 				index := 200
 				if responseCode == 200 {
@@ -280,21 +280,25 @@ The service-defined string used to identify a page of resources. A null value in
 					if verbose {
 						fmt.Println("201-300 exists - if true, 200 will be deleted: ", exists)
 					}
-					delete(op.Responses.StatusCodeResponses, index)
+					if responseCode != 200 {
+						delete(op.Responses.StatusCodeResponses, index)
+					}
 				} else {
 					rsp := op.Responses.StatusCodeResponses[index]
 
 					// if rsp.Schema == nil {
-					// 	fmt.Println("parameters: ", op.Parameters)
-					// 	if rsp.Description == "" {
-					// 		if on == "DELETE" {
-					// 			// Always overwrite for the Delete case
-					// 			rsp.Description = http.StatusText(responseCode)
-					// 		} else {
-					// 			rsp.Description = on + " operation response"
-					// 		}
+					// 	if on == "DELETE" {
+					// 		// Always overwrite for the Delete case
+					// 		rsp.Description = http.StatusText(responseCode)
+					// 		otherRsp := op.Responses.StatusCodeResponses[204]
+					// 		rsp.Schema = otherRsp.Schema
+					// 	} else if rsp.Description == "" {
+					// 		rsp.Description = "A successful response."
+					// 		otherRsp := op.Responses.StatusCodeResponses[201]
+					// 		rsp.Schema = otherRsp.Schema
 					// 	}
-					// 	delete(op.Responses.StatusCodeResponses, index)
+					// 	// delete(sw.Definitions, trim(rsp.Ref))
+					// 	// delete(op.Responses.StatusCodeResponses, index)
 					// 	op.Responses.StatusCodeResponses[responseCode] = rsp
 					// } else {
 					if rsp.Schema != nil && !isNilRef(rsp.Schema.Ref) {
