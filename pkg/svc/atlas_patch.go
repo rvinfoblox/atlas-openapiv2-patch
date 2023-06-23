@@ -262,14 +262,14 @@ The service-defined string used to identify a page of resources. A null value in
 			if op.Responses.StatusCodeResponses != nil {
 				// check if StatusCodeResponses has 201 >= x < 300 then delete 200 and don't go to isNilRef check
 				exists := false
-				if responseCode != 200 {
-					for code := range op.Responses.StatusCodeResponses {
-						if code >= 201 && code < 300 {
-							exists = true
-						}
-						break
+				// if responseCode != 200 {
+				for code := range op.Responses.StatusCodeResponses {
+					if code >= 201 && code < 300 {
+						exists = true
 					}
+					break
 				}
+				// }
 
 				index := 200
 				if responseCode == 200 {
@@ -280,9 +280,7 @@ The service-defined string used to identify a page of resources. A null value in
 					if verbose {
 						fmt.Println("201-300 exists - if true, 200 will be deleted: ", exists)
 					}
-					// if responseCode != 200 {
 					delete(op.Responses.StatusCodeResponses, index)
-					// }
 				} else {
 					rsp := op.Responses.StatusCodeResponses[index]
 
