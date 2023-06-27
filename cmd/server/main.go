@@ -13,6 +13,7 @@ import (
 )
 
 func run(reg *descriptor.Registry, swaggerFiles []string) error {
+	fmt.Printf("Atlas openapiv2 patch - Input args: %+v\n", reg)
 	for _, file := range swaggerFiles {
 		fileName := file
 		var f []byte
@@ -59,8 +60,6 @@ func main() {
 	reg.SetPutResponse(*withPutResponse)
 	reg.SetPatchResponse(*withPatchResponse)
 	reg.SetDeleteResponse(*withDeleteResponse)
-	// fmt.Printf("input args: %+v\n", reg)
-	glog.V(1).Infof("Atlas openapiv2 patch - Input args: %+v\n", reg)
 	glog.V(1).Info("Processing code generator request")
 
 	if len(*swaggerFiles) == 0 {
