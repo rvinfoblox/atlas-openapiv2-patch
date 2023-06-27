@@ -60,7 +60,7 @@ func main() {
 	reg.SetPatchResponse(*withPatchResponse)
 	reg.SetDeleteResponse(*withDeleteResponse)
 	// fmt.Printf("input args: %+v\n", reg)
-	glog.Info("Atlas openapiv2 patch - Input args: %+v\n", reg)
+	glog.V(1).Infof("Atlas openapiv2 patch - Input args: %+v\n", reg)
 	glog.V(1).Info("Processing code generator request")
 
 	if len(*swaggerFiles) == 0 {
